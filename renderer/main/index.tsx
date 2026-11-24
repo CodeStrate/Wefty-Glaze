@@ -6,8 +6,11 @@ import "../styles.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider, Toaster } from "@glaze/core/components";
 import { initLogging } from "@glaze/core/utils";
+import { applyCachedTheme } from "../lib/themes";
 
 initLogging();
+// Paint in the last theme right away; the saved one arrives over IPC in RootView.
+applyCachedTheme();
 
 // Get the root element
 const rootElement = document.getElementById("root");

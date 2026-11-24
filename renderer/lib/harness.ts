@@ -1,5 +1,3 @@
-import { amber, blue, gray, green, orange, purple } from "@radix-ui/colors";
-
 import type { HarnessId, LibraryItem, MemoryType } from "@main/shared/types";
 
 export type BadgeColor =
@@ -16,21 +14,27 @@ export type BadgeColor =
 export interface HarnessStyle {
   name: string;
   badge: BadgeColor;
-  /** Data-visualization color used for graph nodes and sidebar dots. */
+  /**
+   * Data-visualization color for graph nodes, timeline bars, and sidebar dots: a Glaze
+   * support-colour `var(--*)` so it follows the theme (see lib/themes.ts).
+   */
   color: string;
 }
 
-export const HARNESS_ORDER: HarnessId[] = ["claude-code", "codex", "cursor", "opencode", "aider"];
+export const HARNESS_ORDER: HarnessId[] = ["claude-code", "codex", "cursor", "opencode"];
 
 export const HARNESS_STYLES: Record<HarnessId, HarnessStyle> = {
-  "claude-code": { name: "Claude Code", badge: "orange", color: orange.orange9 },
-  codex: { name: "Codex", badge: "blue", color: blue.blue9 },
-  cursor: { name: "Cursor", badge: "purple", color: purple.purple9 },
-  opencode: { name: "opencode", badge: "green", color: green.green9 },
-  aider: { name: "Aider", badge: "yellow", color: amber.amber9 },
+  "claude-code": { name: "Claude Code", badge: "orange", color: "var(--orange)" },
+  codex: { name: "Codex", badge: "blue", color: "var(--blue)" },
+  cursor: { name: "Cursor", badge: "purple", color: "var(--purple)" },
+  opencode: { name: "opencode", badge: "green", color: "var(--green)" },
 };
 
-export const SHARED_STYLE: HarnessStyle = { name: "Shared", badge: "secondary", color: gray.gray9 };
+export const SHARED_STYLE: HarnessStyle = {
+  name: "Shared",
+  badge: "secondary",
+  color: "var(--gray-9)",
+};
 
 export function isHarnessId(value: string): value is HarnessId {
   return (HARNESS_ORDER as string[]).includes(value);

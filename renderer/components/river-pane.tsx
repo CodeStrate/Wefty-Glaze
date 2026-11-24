@@ -559,7 +559,7 @@ export function RiverPane({
                             width={glyphRight - left}
                             height={BAR_H}
                             rx={3}
-                            fill={item.color}
+                            style={{ fill: item.color }}
                           />
                           {selected ? (
                             <rect

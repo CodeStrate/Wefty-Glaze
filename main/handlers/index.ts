@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 
 import { registerLibraryHandlers } from "./library.js";
 import { registerTerminalHandlers } from "./terminal.js";
+import { registerThemeHandlers } from "./theme.js";
 import { getSettingsWindow, openSettingsWindow } from "../windows/settings-window.js";
 
 import { ipcMain, logger } from "@glaze/core/backend";
@@ -34,6 +35,9 @@ export function registerHandlers(): void {
 
   // Embedded terminals (node-pty)
   registerTerminalHandlers();
+
+  // Colour theme and Light/Dark appearance
+  registerThemeHandlers();
 
   logger.info("handlers", "IPC handlers registered");
 }

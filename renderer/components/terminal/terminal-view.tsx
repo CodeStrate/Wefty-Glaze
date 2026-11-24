@@ -6,27 +6,12 @@ import "@xterm/xterm/css/xterm.css";
 
 import { resizeTerminal, writeTerminal } from "../../lib/terminal-api";
 import { attachTerminal } from "../../lib/terminal-bus";
+import { currentTerminalTheme, onThemeChange } from "../../lib/themes";
 
 /**
  * xterm.js renders the PTY output. It's pure JavaScript (no WASM or eval), which Glaze's
- * WebView security policy requires; ghostty-web can come back in the Electron shell.
+ * WebView security policy requires. Its palette comes from the active theme.
  */
-function terminalTheme() {
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  return dark
-    ? {
-        background: "#161616",
-        foreground: "#e6e6e6",
-        cursor: "#e6e6e6",
-        selectionBackground: "#3a4a6b",
-      }
-    : {
-        background: "#fbfbfb",
-        foreground: "#1f1f1f",
-        cursor: "#1f1f1f",
-        selectionBackground: "#b9d0ff",
-      };
-}
 
 interface TerminalViewProps {
   id: string;
@@ -54,7 +39,7 @@ export function TerminalView({ id, visible }: TerminalViewProps) {
         scrollback: 10_000,
         allowProposedApi: false,
         macOptionIsMeta: true,
-        theme: terminalTheme(),
+        theme: currentTerminalTheme(),
       });
       fit = new FitAddon();
       term.loadAddon(fit);
@@ -77,12 +62,17 @@ export function TerminalView({ id, visible }: TerminalViewProps) {
     const detach = attachTerminal(id, (data) => term.write(data));
     const observer = new ResizeObserver(() => refit());
     observer.observe(host);
+    // Follow theme changes (Settings, or light/dark switching) without a restart.
+    const offTheme = onThemeChange(() => {
+      term.options.theme = currentTerminalTheme();
+    });
     // The shell started at 80×24; tell it the real size right away.
     void resizeTerminal(id, term.cols, term.rows).catch(() => undefined);
 
     termRef.current = term;
     fitRef.current = fit;
     return () => {
+      offTheme();
       observer.disconnect();
       inputSub.dispose();
       resizeSub.dispose();

@@ -175,7 +175,7 @@ async function summarizeCached(file: string): Promise<SessionSummary | null> {
   return summary;
 }
 
-/** `MEMORY.md` index lines look like `- [Title](file.md) — hook`. */
+/** `MEMORY.md` index lines look like `- [Title](file.md) - hook` (Claude writes an em dash, U+2014). */
 async function readIndexHooks(memoryDir: string): Promise<Map<string, string>> {
   const hooks = new Map<string, string>();
   try {

@@ -11,6 +11,7 @@ import {
 } from "@glaze/core/backend";
 
 import { registerHandlers } from "./handlers/index.js";
+import { applySavedTheme } from "./handlers/theme.js";
 import { getPreloadPath, getWindowUrl } from "./windows/window-paths.js";
 import { openSettingsWindow } from "./windows/settings-window.js";
 
@@ -104,6 +105,9 @@ app.on("activate", (hasVisibleWindows) => {
 });
 
 app.whenReady().then(async () => {
+  await applySavedTheme().catch((error) =>
+    logger.error("main", "Failed to apply the saved theme", error),
+  );
   await setupApplicationMenu();
   createMainWindow().catch((error) => logger.error("main", "Failed to create main window", error));
 });

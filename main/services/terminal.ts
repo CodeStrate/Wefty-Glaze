@@ -1,5 +1,5 @@
 /**
- * Embedded terminal sessions: one PTY per tab. Glaze-free on purpose — the caller wires
+ * Embedded terminal sessions: one PTY per tab. Glaze-free on purpose: the caller wires
  * output/exit events to IPC so this can be reused by an Electron shell or the MCP server.
  */
 import { randomUUID } from "crypto";
@@ -8,6 +8,7 @@ import { createRequire } from "module";
 import * as path from "path";
 import * as pty from "node-pty";
 
+import type { CreatedTerminal } from "../shared/types.js";
 import { defaultShell, HOME, loginShellArgs } from "./platform.js";
 
 export interface TerminalEvents {
@@ -90,12 +91,13 @@ function flush(id: string, session: Session): void {
   events?.onData(id, data);
 }
 
-export function createTerminal(options: CreateTerminalOptions): { id: string; cwd: string } {
+export function createTerminal(options: CreateTerminalOptions): CreatedTerminal {
   if (sessions.size >= MAX_TERMINALS)
     throw new Error(`At most ${MAX_TERMINALS} terminals can be open`);
   const cwd = resolveCwd(options.cwd);
   ensureSpawnHelperExecutable();
-  const proc = pty.spawn(defaultShell(), loginShellArgs(), {
+  const shell = defaultShell();
+  const proc = pty.spawn(shell, loginShellArgs(), {
     name: "xterm-256color",
     cols: clampSize(options.cols, 80),
     rows: clampSize(options.rows, 24),
@@ -122,7 +124,12 @@ export function createTerminal(options: CreateTerminalOptions): { id: string; cw
   });
 
   if (options.command) proc.write(`${options.command}\r`);
-  return { id, cwd };
+  return {
+    id,
+    cwd,
+    shell: path.parse(shell).name,
+    folder: cwd === HOME ? "~" : path.basename(cwd),
+  };
 }
 
 function requireSession(id: string): Session {

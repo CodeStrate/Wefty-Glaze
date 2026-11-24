@@ -3,15 +3,19 @@
  * Renderer code imports these with `import type` only.
  */
 
-export type HarnessId = "claude-code" | "codex" | "cursor" | "opencode" | "aider";
+/** A new embedded terminal. `shell` and `folder` make up its tab title. */
+export interface CreatedTerminal {
+  id: string;
+  cwd: string;
+  /** Shell executable name, e.g. "zsh". */
+  shell: string;
+  /** Last path component of `cwd`, or "~" for the home folder. */
+  folder: string;
+}
 
-export const HARNESS_IDS: readonly HarnessId[] = [
-  "claude-code",
-  "codex",
-  "cursor",
-  "opencode",
-  "aider",
-];
+export type HarnessId = "claude-code" | "codex" | "cursor" | "opencode";
+
+export const HARNESS_IDS: readonly HarnessId[] = ["claude-code", "codex", "cursor", "opencode"];
 
 export interface HarnessInfo {
   id: HarnessId;
@@ -134,3 +138,15 @@ export type PathMatch =
   | { kind: "item"; id: string }
   | { kind: "project"; path: string }
   | { kind: "none" };
+
+/** The Appearance setting: follow macOS, or force light/dark. */
+export type ThemeSource = "system" | "light" | "dark";
+
+/** A colour theme either follows light/dark (adaptive) or is always one of them. */
+export type ThemeMode = "adaptive" | "light" | "dark";
+
+export interface ThemeInfo {
+  /** Selected colour theme (presets live in renderer/lib/themes.ts). */
+  themeId: string;
+  themeSource: ThemeSource;
+}

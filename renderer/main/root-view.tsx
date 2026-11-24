@@ -1,11 +1,10 @@
 import { Outlet } from "@tanstack/react-router";
 import * as React from "react";
-import { useTheme } from "@glaze/core/hooks";
-
 import { TerminalProvider } from "../lib/terminal-context";
+import { useAppTheme } from "../lib/themes";
 
 export function RootView() {
-  useTheme();
+  useAppTheme();
 
   // Cleanup IPC connection on unmount
   React.useEffect(() => {

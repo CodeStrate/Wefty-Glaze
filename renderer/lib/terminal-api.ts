@@ -1,10 +1,7 @@
+import type { CreatedTerminal } from "@main/shared/types";
+
 function ipc() {
   return window.glazeAPI.glaze.ipc;
-}
-
-export interface CreatedTerminal {
-  id: string;
-  cwd: string;
 }
 
 export function createTerminal(input: {

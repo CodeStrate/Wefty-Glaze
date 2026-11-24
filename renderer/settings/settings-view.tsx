@@ -16,11 +16,12 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
+  Text,
   toast,
 } from "@glaze/core/components";
-import type { NativeThemeInfo } from "@glaze/core/ipc";
+import { cn } from "@glaze/core/utils";
 
-import type { HarnessInfo } from "@main/shared/types";
+import type { HarnessInfo, ThemeInfo } from "@main/shared/types";
 
 import { errorMessage } from "../components/detail/detail-parts";
 import { plural, shortenPath } from "../lib/format";
@@ -31,6 +32,15 @@ import {
   useSetHarnessEnabled,
   useSetProjectHidden,
 } from "../lib/library-api";
+import {
+  THEME_PRESETS,
+  findTheme,
+  isDark,
+  onThemeChange,
+  terminalPalette,
+  useAppTheme,
+  type ThemePreset,
+} from "../lib/themes";
 
 function harnessDescription(harness: HarnessInfo): string {
   if (!harness.enabled) return harness.available ? "Found on this Mac" : "Not found on this Mac";
@@ -122,9 +132,90 @@ function LibrarySettings() {
   );
 }
 
+/** A small picture of the theme: window, sidebar card, accent, and terminal colours. */
+function ThemeSwatch({ preset, dark }: { preset: ThemePreset; dark: boolean }) {
+  const terminal = terminalPalette(
+    preset,
+    preset.mode === "adaptive" ? dark : preset.mode === "dark",
+  );
+  const page = preset.theme?.background ?? (dark ? "#1c1c1e" : "#ffffff");
+  const foreground = preset.theme?.foreground ?? (dark ? "#ffffff" : "#000000");
+  const panel = `color-mix(in srgb, ${foreground} 10%, ${page})`;
+  const accent = preset.theme?.accent ?? "var(--accent)";
+  const ansi = [
+    terminal.red,
+    terminal.green,
+    terminal.yellow,
+    terminal.blue,
+    terminal.magenta,
+    terminal.cyan,
+  ].map((color) => color ?? foreground);
+  return (
+    <div className="flex h-16 overflow-hidden rounded-lg" style={{ background: page }} aria-hidden>
+      <div className="m-1.5 w-7 rounded-md" style={{ background: panel }} />
+      <div className="flex flex-1 flex-col justify-between py-2 pr-2">
+        <div className="h-1.5 w-10 rounded-full" style={{ background: accent }} />
+        <div className="flex gap-1 rounded px-1.5 py-1" style={{ background: terminal.background }}>
+          {ansi.map((color, index) => (
+            <span key={index} className="size-1.5 rounded-full" style={{ background: color }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThemeGallery({
+  selectedId,
+  dark,
+  onSelect,
+}: {
+  selectedId: string;
+  dark: boolean;
+  onSelect: (preset: ThemePreset) => void;
+}) {
+  return (
+    <div role="radiogroup" aria-label="Theme" className="grid grid-cols-3 gap-3 py-1">
+      {THEME_PRESETS.map((preset) => {
+        const selected = preset.id === selectedId;
+        return (
+          <button
+            key={preset.id}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => onSelect(preset)}
+            className={cn(
+              "flex flex-col gap-1.5 rounded-xl p-1.5 text-left outline-none",
+              "hover:bg-surface-control-subtle focus-visible:ring-2 focus-visible:ring-accent/60",
+              selected && "ring-2 ring-accent",
+            )}
+          >
+            <ThemeSwatch preset={preset} dark={dark} />
+            <Text variant="small" className="px-0.5">
+              {preset.name}
+              <Text as="span" variant="small" color="tertiary">
+                {preset.mode === "adaptive"
+                  ? " · Light & Dark"
+                  : preset.mode === "dark"
+                    ? " · Dark"
+                    : " · Light"}
+              </Text>
+            </Text>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function SettingsView() {
-  const [themeInfo, setThemeInfo] = useState<NativeThemeInfo | null>(null);
+  useAppTheme();
+  const [themeInfo, setThemeInfo] = useState<ThemeInfo | null>(null);
+  const [dark, setDark] = useState(isDark);
   const [_isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => onThemeChange(() => setDark(isDark())), []);
 
   // Close settings window on Escape, unless an interactive element is focused or a popover is open
   useEffect(() => {
@@ -156,8 +247,7 @@ export function SettingsView() {
 
   const refreshThemeInfo = async () => {
     try {
-      const info = await window.glazeAPI.nativeTheme.getInfo();
-      setThemeInfo(info);
+      setThemeInfo(await window.glazeAPI.glaze.ipc.invoke<ThemeInfo>("theme:get"));
     } catch (error) {
       toast.error(`Failed to get theme info: ${error}`);
     } finally {
@@ -169,11 +259,24 @@ export function SettingsView() {
     refreshThemeInfo();
   }, []);
 
+  const handleThemePreset = async (preset: ThemePreset) => {
+    try {
+      setThemeInfo(
+        await window.glazeAPI.glaze.ipc.invoke<ThemeInfo>("theme:set", {
+          themeId: preset.id,
+          mode: preset.mode,
+        }),
+      );
+    } catch (error) {
+      toast.error(`Failed to set theme: ${error}`);
+    }
+  };
+  const activePreset = findTheme(themeInfo?.themeId);
+
   const handleThemeChange = async (value: string) => {
     const source = value as "system" | "light" | "dark";
     try {
-      await window.glazeAPI.nativeTheme.setThemeSource(source);
-      await refreshThemeInfo();
+      setThemeInfo(await window.glazeAPI.glaze.ipc.invoke<ThemeInfo>("theme:set", { source }));
     } catch (error) {
       toast.error(`Failed to set theme: ${error}`);
     }
@@ -191,7 +294,23 @@ export function SettingsView() {
     >
       <div className="px-4 flex flex-col gap-8 mb-8">
         <FieldSet>
+          <FieldLegend>Theme</FieldLegend>
+          <FieldDescription>Colours for the whole app, including the terminal.</FieldDescription>
+          <ThemeGallery
+            selectedId={activePreset.id}
+            dark={dark}
+            onSelect={(preset) => void handleThemePreset(preset)}
+          />
+        </FieldSet>
+
+        <FieldSet>
           <FieldLegend>Appearance</FieldLegend>
+          {activePreset.mode !== "adaptive" ? (
+            <FieldDescription>
+              {activePreset.name} is always {activePreset.mode}. Choose Wefty to follow Light and
+              Dark.
+            </FieldDescription>
+          ) : null}
           <FieldGroup>
             <Field orientation="horizontal">
               <FieldContent>
@@ -201,6 +320,7 @@ export function SettingsView() {
                 value={themeInfo?.themeSource ?? "system"}
                 onValueChange={handleThemeChange}
                 orientation="horizontal"
+                disabled={activePreset.mode !== "adaptive"}
               >
                 <Label>
                   <RadioGroupItem value="system" />

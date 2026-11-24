@@ -2,6 +2,7 @@ import { useEffect, useRef, type MutableRefObject } from "react";
 import { cn } from "@glaze/core/utils";
 
 import type { GraphData, GraphNode } from "../../lib/graph-data";
+import { onThemeChange } from "../../lib/themes";
 import { GraphEngine, type GraphPalette } from "./graph-engine";
 
 export interface GraphControls {
@@ -84,7 +85,11 @@ export function GraphCanvas({
       attributeFilter: ["class", "style", "data-theme"],
     });
 
+    // Switching between two presets of the same appearance changes no attribute on <html>.
+    const offTheme = onThemeChange(refreshPalette);
+
     return () => {
+      offTheme();
       media.removeEventListener("change", refreshPalette);
       observer.disconnect();
       engine.destroy();

@@ -9,7 +9,6 @@ import {
 } from "react";
 import { toast } from "@glaze/core/components";
 
-import { baseName } from "./format";
 import { createTerminal, killTerminal, onTerminalExit, writeTerminal } from "./terminal-api";
 import { forgetTerminal, startRecording } from "./terminal-bus";
 
@@ -68,7 +67,7 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
         cwd: options.cwd ?? null,
         command: options.command ?? null,
       });
-      const title = options.title ?? (baseName(created.cwd) || "Terminal");
+      const title = options.title ?? `${created.shell} - ${created.folder}`;
       setTabs((current) => [
         ...current,
         { id: created.id, title, cwd: created.cwd, exited: false },

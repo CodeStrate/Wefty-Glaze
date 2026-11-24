@@ -379,8 +379,8 @@ export function SessionDetailPane({
                   aria-label={newestFirst ? "Show oldest first" : "Show newest first"}
                   title={
                     newestFirst
-                      ? "Newest first — click for oldest first"
-                      : "Oldest first — click for newest first"
+                      ? "Newest first. Click for oldest first"
+                      : "Oldest first. Click for newest first"
                   }
                   onClick={() => {
                     setNewestFirst(!newestFirst);
@@ -425,7 +425,7 @@ export function SessionDetailPane({
             ) : null}
             {detail.data?.truncated ? (
               <Text variant="small" color="tertiary" className="text-center">
-                Very long session — only the first {detail.data.entries.length.toLocaleString()}{" "}
+                Very long session: only the first {detail.data.entries.length.toLocaleString()}{" "}
                 entries are shown.
               </Text>
             ) : null}

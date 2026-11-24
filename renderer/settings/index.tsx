@@ -3,10 +3,12 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider, Toaster } from "@glaze/core/components";
 import { initLogging } from "@glaze/core/utils";
+import { applyCachedTheme } from "../lib/themes";
 import { SettingsView } from "./settings-view";
 import "../styles.css";
 
 initLogging();
+applyCachedTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {

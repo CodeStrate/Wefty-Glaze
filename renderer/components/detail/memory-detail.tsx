@@ -164,7 +164,7 @@ export function MemoryDetailPane({
       }
     >
       <div className="flex min-w-0 flex-col gap-6 px-4 pb-8">
-        <DetailTitle title={dirty ? `${memory.title} — Edited` : memory.title}>
+        <DetailTitle title={dirty ? `${memory.title} (edited)` : memory.title}>
           {memory.harnesses.map((harness) => (
             <Badge key={harness} color={HARNESS_STYLES[harness].badge}>
               {HARNESS_STYLES[harness].name}

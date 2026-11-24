@@ -3,7 +3,7 @@ import * as path from "path";
 
 import { app, logger } from "@glaze/core/backend";
 
-import { HARNESS_IDS, type HarnessId } from "../shared/types.js";
+import { HARNESS_IDS, type HarnessId, type ThemeMode, type ThemeSource } from "../shared/types.js";
 import { isAbsolutePath } from "./platform.js";
 import { isRecord, writeFileAtomic } from "./util.js";
 
@@ -15,12 +15,20 @@ export interface Preferences {
   projectNames: Record<string, string>;
   /** Projects removed from the library (files untouched). */
   hiddenProjects: string[];
+  /** Appearance: follow macOS, or force light/dark. */
+  themeSource: ThemeSource;
+  /** Colour theme preset, and whether it forces light or dark. */
+  themeId: string;
+  themeMode: ThemeMode;
 }
 
 const DEFAULTS: Preferences = {
   enabledHarnesses: ["claude-code"],
   projectNames: {},
   hiddenProjects: [],
+  themeSource: "system",
+  themeId: "wefty",
+  themeMode: "adaptive",
 };
 
 let cached: Preferences | null = null;
@@ -47,10 +55,21 @@ function normalize(raw: unknown): Preferences {
         (value): value is string => typeof value === "string" && isAbsolutePath(value),
       )
     : [];
+  const themeSource =
+    raw.themeSource === "light" || raw.themeSource === "dark" ? raw.themeSource : "system";
+  const themeId =
+    typeof raw.themeId === "string" && /^[a-z0-9-]{1,40}$/.test(raw.themeId)
+      ? raw.themeId
+      : DEFAULTS.themeId;
+  const themeMode =
+    raw.themeMode === "light" || raw.themeMode === "dark" ? raw.themeMode : "adaptive";
   return {
     enabledHarnesses: enabled.length > 0 ? [...enabled] : [...DEFAULTS.enabledHarnesses],
     projectNames,
     hiddenProjects: [...new Set(hiddenProjects)],
+    themeSource,
+    themeId,
+    themeMode,
   };
 }
 

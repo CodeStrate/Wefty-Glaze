@@ -21,7 +21,7 @@ function Item({ term, children }: { term: string; children: ReactNode }) {
       <Text as="span" variant="strong" color="primary">
         {term}
       </Text>{" "}
-      — {children}
+      - {children}
     </Text>
   );
 }
@@ -56,8 +56,8 @@ export function HelpDialog({ onClose, onStartTour }: HelpDialogProps) {
 
         <Section title="The library">
           <Item term="Harnesses">
-            Claude Code is scanned by default. Add Codex, Cursor, opencode, or Aider with the + next
-            to Harnesses; only the ones you add are read.
+            Claude Code is scanned by default. Add Codex, Cursor, or opencode with the + next to
+            Harnesses; only the ones you add are read.
           </Item>
           <Item term="Projects">
             One per working folder. Right-click to rename, open in the terminal, remove from the
@@ -87,13 +87,13 @@ export function HelpDialog({ onClose, onStartTour }: HelpDialogProps) {
             hover a message to copy it.
           </Item>
           <Item term="Resume">
-            The terminal button resumes the session in its own folder — Claude Code, Codex, and
-            opencode support this. Cursor and Aider sessions can only open their folder.
+            The terminal button resumes the session in its own folder. Claude Code, Codex, and
+            opencode support this. Cursor sessions can only open their folder.
           </Item>
           <Item term="Handoff">
             Builds a Markdown brief: the goal, open threads, the last turns, files touched, and
             related memories. Copy it, insert its path in the terminal, or Continue in Claude Code
-            or Codex to pick the work up in a fresh session — across harnesses too.
+            or Codex to pick the work up in a fresh session, across harnesses too.
           </Item>
         </Section>
 
@@ -110,7 +110,7 @@ export function HelpDialog({ onClose, onStartTour }: HelpDialogProps) {
         <Section title="Drag and drop">
           <Item term="Into the terminal">
             Drag a list row, timeline bar, or graph node (drag it past the canvas edge) onto the
-            terminal. A memory types its path, a session its resume command — nothing runs until you
+            terminal. A memory types its path, a session its resume command. Nothing runs until you
             press Enter. Files from Finder type their paths.
           </Item>
           <Item term="Into Wefty">
