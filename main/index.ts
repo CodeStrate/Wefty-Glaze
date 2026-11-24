@@ -13,7 +13,7 @@ import {
 import { registerHandlers } from "./handlers/index.js";
 import { applySavedTheme } from "./handlers/theme.js";
 import { getPreloadPath, getWindowUrl } from "./windows/window-paths.js";
-import { openSettingsWindow } from "./windows/settings-window.js";
+import { getSettingsWindow, openSettingsWindow } from "./windows/settings-window.js";
 
 const APP_NAME = "Wefty";
 
@@ -38,6 +38,11 @@ async function createMainWindow() {
   });
 
   mainWindow.once("ready-to-show", () => mainWindow?.show());
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+    // Settings belongs to the main window, so it shouldn't stay behind on its own.
+    getSettingsWindow()?.close();
+  });
   await mainWindow.loadURL(await getWindowUrl("main-window.html"));
 }
 
