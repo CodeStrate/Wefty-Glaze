@@ -23,6 +23,11 @@ export interface OpenTerminalOptions {
   cwd?: string | null;
   /** Typed into the shell once it starts. */
   command?: string | null;
+  /**
+   * For resuming or continuing a session: refuse (with a message) when `cwd` no longer
+   * exists, instead of starting in the home folder.
+   */
+  requireCwd?: boolean;
   title?: string;
 }
 
@@ -66,6 +71,7 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
       const created = await createTerminal({
         cwd: options.cwd ?? null,
         command: options.command ?? null,
+        requireCwd: options.requireCwd ?? false,
       });
       const title = options.title ?? `${created.shell} - ${created.folder}`;
       setTabs((current) => [
@@ -76,7 +82,10 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
       setOpen(true);
       return created.id;
     } catch (error) {
-      toast.error(`Couldn't open a terminal: ${failure(error)}`);
+      // A missing session folder explains itself; anything else is a failure to start.
+      toast.error(
+        options.requireCwd ? failure(error) : `Couldn't open a terminal: ${failure(error)}`,
+      );
       return null;
     }
   }, []);

@@ -55,7 +55,12 @@ type OpenTerminal = (options?: OpenTerminalOptions) => Promise<string | null>;
 export function resumeInTerminal(open: OpenTerminal, session: SessionSummary): boolean {
   const spec = resumeSpec(session);
   if (!spec) return false;
-  void open({ cwd: spec.cwd, command: spec.command, title: session.title.slice(0, 24) });
+  void open({
+    cwd: spec.cwd,
+    command: spec.command,
+    requireCwd: true,
+    title: session.title.slice(0, 24),
+  });
   return true;
 }
 

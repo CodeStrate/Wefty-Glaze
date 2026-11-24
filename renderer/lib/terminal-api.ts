@@ -7,6 +7,8 @@ function ipc() {
 export function createTerminal(input: {
   cwd?: string | null;
   command?: string | null;
+  /** Refuse instead of falling back to the home folder when `cwd` is missing. */
+  requireCwd?: boolean;
   cols?: number;
   rows?: number;
 }): Promise<CreatedTerminal> {

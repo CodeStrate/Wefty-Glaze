@@ -210,6 +210,7 @@ export function SessionDetailPane({
       openTerminal({
         cwd: session.cwd,
         command: `${cli} ${shellQuote(`Read ${handoff.path} and continue the work it describes.`)}`,
+        requireCwd: true,
         title: `${name}: ${session.title.slice(0, 18)}`,
       }),
     );

@@ -42,6 +42,7 @@ export function registerTerminalHandlers(): void {
     return createTerminal({
       cwd,
       command,
+      requireCwd: isRecord(params) && params.requireCwd === true,
       cols: optionalNumber(params, "cols"),
       rows: optionalNumber(params, "rows"),
     });

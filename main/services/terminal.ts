@@ -20,6 +20,11 @@ export interface CreateTerminalOptions {
   cwd?: string | null;
   /** Typed into the shell once it starts, so the shell survives when the command exits. */
   command?: string | null;
+  /**
+   * Refuse to start when `cwd` is given but no longer exists (resuming or continuing a
+   * session there would run in the wrong project). Otherwise the home folder is used.
+   */
+  requireCwd?: boolean;
   cols?: number;
   rows?: number;
 }
@@ -71,13 +76,19 @@ function clampSize(value: number | undefined, fallback: number): number {
   return Number.isInteger(value) && value! > 0 && value! < 1000 ? value! : fallback;
 }
 
-function resolveCwd(cwd: string | null | undefined): string {
-  if (cwd) {
-    try {
-      if (fs.statSync(cwd).isDirectory()) return cwd;
-    } catch {
-      // Fall through: the project folder may have been moved or deleted.
-    }
+function isDirectory(target: string): boolean {
+  try {
+    return fs.statSync(target).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/** The project folder may have been moved or deleted; a plain terminal then starts at home. */
+function resolveCwd(cwd: string | null | undefined, requireCwd = false): string {
+  if (cwd && isDirectory(cwd)) return cwd;
+  if (cwd && requireCwd) {
+    throw new Error(`This session's folder no longer exists: ${cwd}`);
   }
   return HOME;
 }
@@ -94,7 +105,7 @@ function flush(id: string, session: Session): void {
 export function createTerminal(options: CreateTerminalOptions): CreatedTerminal {
   if (sessions.size >= MAX_TERMINALS)
     throw new Error(`At most ${MAX_TERMINALS} terminals can be open`);
-  const cwd = resolveCwd(options.cwd);
+  const cwd = resolveCwd(options.cwd, options.requireCwd);
   ensureSpawnHelperExecutable();
   const shell = defaultShell();
   const proc = pty.spawn(shell, loginShellArgs(), {
