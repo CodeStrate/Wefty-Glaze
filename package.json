@@ -1,8 +1,8 @@
 {
-  "id": "2kx8bm18",
-  "name": "wefty",
+  "id": "1qak8f4a",
+  "name": "wefty-glaze-port",
   "version": "1.0.0",
-  "productName": "Wefty",
+  "productName": "Wefty Glaze Port",
   "description": "Unify all agent sessions and memories",
   "iconDescription": "A universal workspace that consolidates chat histories, memories, and contexts from multiple AI agents and platforms into one searchable interface. Users can visualize connections between sessions like a knowledge graph, drag-and-drop memories between conversations, and continue work across different AI harnesses seamlessly. Think of an interconnected web of threads, a bridge connecting islands, or overlapping conversation bubbles linking together.",
   "private": true,
@@ -63,15 +63,15 @@
   },
   "packageManager": "npm@11.11.0+sha512-82gRxKrh/eY5UnNorkTFcdBQAGpgjWehkfGVqAGlJjejEtJZGGJUqjo3mbBTNbc5BTnPKGVtGPBZGhElujX5cw==",
   "glaze": {
-    "appId": "context-bridge-local-2kx8bm18",
+    "appId": "wefty-glaze-port-local-1qak8f4a",
     "variant": "local",
     "capabilities": {},
     "sdkVersion": "0.14.6.0",
-    "createdAt": "2026-10-07T19:05:09.758Z",
+    "createdAt": "2026-11-24T09:57:08.255Z",
     "lastMigration": "sdk-projection-paths",
     "host": {
       "minVersion": "0.14.6.0"
     },
-    "updatedAt": 1795515065467
+    "updatedAt": 1795517898064
   }
 }
