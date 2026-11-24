@@ -12,12 +12,12 @@
  * BUILD & RUNTIME CONSTRAINTS:
  * The preload is built as a self-contained IIFE (not an ES module) because
  * WKWebView injects it via WKUserScript, which only supports classic scripts.
- * This is handled transparently by the build system — write normal imports here
+ * This is handled transparently by the build system: write normal imports here
  * and esbuild bundles everything into one file. Constraints to be aware of:
- * - No dynamic import() — all dependencies are resolved at build time
- * - No top-level await — wrap async code in an async function
- * - No Node.js APIs (fs, path, etc.) — WKWebView is a browser environment
- * - Keep this file thin — everything is inlined, so large deps increase injection time
+ * - No dynamic import(): all dependencies are resolved at build time
+ * - No top-level await: wrap async code in an async function
+ * - No Node.js APIs (fs, path, etc.): WKWebView is a browser environment
+ * - Keep this file thin: everything is inlined, so large deps increase injection time
  * - WKContentWorld provides separate JavaScript environments with their own
  *   globals and prototypes, so the preload world stays isolated from page code
  *
@@ -421,7 +421,7 @@ function exposeGlazeAPI(): void {
 }
 
 // `process.env.GLAZE_DEV_HARNESS` is a build-time define (build-renderer replaces it
-// with "1"/"0"), not a runtime browser global — hence the no-undef disable.
+// with "1"/"0"), not a runtime browser global, hence the no-undef disable.
 if (
   // eslint-disable-next-line no-undef
   process.env.GLAZE_DEV_HARNESS === "1" &&

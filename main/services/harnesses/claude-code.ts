@@ -180,7 +180,7 @@ async function readIndexHooks(memoryDir: string): Promise<Map<string, string>> {
   const hooks = new Map<string, string>();
   try {
     const index = await fs.promises.readFile(path.join(memoryDir, "MEMORY.md"), "utf8");
-    for (const match of index.matchAll(/\[[^\]]*\]\(([^)]+\.md)\)\s*[—–-]\s*(.+)$/gm)) {
+    for (const match of index.matchAll(/\[[^\]]*\]\(([^)]+\.md)\)\s*[\u2014\u2013-]\s*(.+)$/gm)) {
       hooks.set(path.resolve(memoryDir, match[1]), match[2].trim());
     }
   } catch {
