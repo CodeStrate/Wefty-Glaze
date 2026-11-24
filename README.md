@@ -21,7 +21,9 @@ Wefty does three things:
 
 It isn't an agent and it isn't a sync service. It reads and writes **your local files**, runs your shell in its terminal, and does nothing else.
 
-> **Alpha.** Cursor and opencode support is untested. Expect rough edges, and [issues](https://github.com/CodeStrate/Wefty/issues) are very welcome.
+> **Alpha.** Cursor and opencode support is untested. Expect rough edges, and [issues](https://github.com/CodeStrate/Wefty-Glaze/issues) are very welcome.
+
+This is the macOS edition of Wefty, built on [Glaze](https://glaze.app). The main app lives at [CodeStrate/Wefty](https://github.com/CodeStrate/Wefty).
 
 [Features](#features) · [Harnesses](#supported-harnesses) · [Getting Started](#getting-started) · [How It Works](#how-it-works) · [Privacy](#privacy) · [Stack](#stack) · [Development](#development) · [Contributing](#contributing) · [Roadmap](#roadmap)
 
@@ -83,12 +85,11 @@ Only Claude Code is scanned by default. Add others from the **+** next to *Harne
 
 ## Getting Started
 
-**Requires macOS and [Glaze](https://glaze.app).** This branch is the Glaze build of Wefty.
+**Requires macOS and [Glaze](https://glaze.app).**
 
 ```bash
-git clone https://github.com/CodeStrate/Wefty
-cd Wefty
-git checkout build/glaze
+git clone https://github.com/CodeStrate/Wefty-Glaze
+cd Wefty-Glaze
 sh ./glaze-node.sh --npm install --include=dev
 npm run build
 ```
